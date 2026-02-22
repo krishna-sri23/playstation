@@ -14,6 +14,7 @@ import express from "express";
 import cors from "cors";
 import sequelize from "./config/db.js";
 import { errorHandler } from './middlewares/errorHandler.js';
+import "./models/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
