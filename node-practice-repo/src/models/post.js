@@ -10,7 +10,11 @@ const Post = sequelize.define('Post',{
   },
   user_id:{
     type: DataTypes.BIGINT,
-    allowNull: false
+    allowNull: false,
+    references:{
+        model: 'user',
+        key: 'id'
+    }
   },
   content:{
     type: DataTypes.TEXT,

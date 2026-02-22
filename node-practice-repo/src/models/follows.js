@@ -10,11 +10,19 @@ const Follow = sequelize.define('Follow',{
   },
   follower_id:{
     type: DataTypes.BIGINT,
-    allowNull: false
+    allowNull: false,
+    references:{
+        model: 'user',
+        key: 'id'
+    }
   },
   following_id:{
     type: DataTypes.BIGINT,
-    allowNull: false
+    allowNull: false,
+    references:{
+        model:'user',
+        key: 'id'
+    }
   },
   is_deleted:{
     type: DataTypes.TINYINT,

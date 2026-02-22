@@ -22,6 +22,10 @@ const User = sequelize.define('User',{
     type: DataTypes.STRING(100),
     allowNull: false
   },
+  password:{
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
   bio:{
     type: DataTypes.STRING(255),
     defaultValue: ''
@@ -38,7 +42,7 @@ const User = sequelize.define('User',{
         unique: true,
         fields: ['email']
       }
-    ]
+    ],
 });
 
 export default User;

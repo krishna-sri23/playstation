@@ -15,6 +15,7 @@ import cors from "cors";
 import sequelize from "./config/db.js";
 import { errorHandler } from './middlewares/errorHandler.js';
 import "./models/index.js";
+import routes from "./routes/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,8 @@ app.get("/", (req, res) => {
   res.json({ message: "Server is running" });
 });
 
+app.use("/api", routes);
+
 app.use(errorHandler);
 
 // Start server and connect to DB
@@ -36,7 +39,9 @@ const start = async () => {
     await sequelize.authenticate();
     console.log("Database connected successfully");
 
-    await sequelize.sync();
+    await sequelize.sync({
+        // alter: true
+    });
     console.log("Models synced");
 
     app.listen(PORT, () => {
