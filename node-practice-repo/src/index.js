@@ -13,6 +13,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import sequelize from "./config/db.js";
+import redisClient from "./config/redis.js";
 import { errorHandler } from './middlewares/errorHandler.js';
 import "./models/index.js";
 import routes from "./routes/index.js";
@@ -36,6 +37,7 @@ app.use(errorHandler);
 // Start server and connect to DB
 const start = async () => {
   try {
+    await redisClient.connect();
     await sequelize.authenticate();
     console.log("Database connected successfully");
 
@@ -56,8 +58,9 @@ start();
 
 const shutdown = async (signal) => {
   console.log(`${signal} received. Shutting down gracefully...`);
+  await redisClient.quit();
   await sequelize.close();
-  console.log("Database connections closed");
+  console.log("Database and Redis connections closed");
   process.exit(0);
 };
 

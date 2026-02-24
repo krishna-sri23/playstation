@@ -1,6 +1,7 @@
 import { User } from '../models/index.js';
 import { AppError } from '../middlewares/errorHandler.js';
 import bcrypt from 'bcrypt';
+import redisClient from '../config/redis.js';
 
 const register = async (data) => {
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -24,10 +25,18 @@ const login = async (email, password) => {
 };
 
 const getProfile = async (id) => {
+    const cacheKey = `user:${id}`;
+    const cached = await redisClient.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
     const user = await User.findByPk(id, {
       attributes: { exclude: ['password'] },
     });
     if (!user) throw new AppError('User not found', 404);
+
+    await redisClient.set(cacheKey, JSON.stringify(user), { EX: 3600 });
     return user;
 };
 
@@ -51,6 +60,9 @@ const updateProfile = async (id, data) => {
     if (!user) throw new AppError('User not found', 404);
     await user.update(data);
     const { password, ...userWithoutPassword } = user.toJSON();
+
+    const cacheKey = `user:${id}`;
+    await redisClient.set(cacheKey, JSON.stringify(userWithoutPassword), { EX: 3600 });
     return userWithoutPassword;
 };
 
