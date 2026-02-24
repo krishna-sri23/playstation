@@ -1,4 +1,4 @@
-import { Follow, User } from '../models/index.js';
+import { User } from '../models/index.js';
 import bcrypt from 'bcrypt';
 
 const register = async (data) => {                                                                                                                                                                          
@@ -22,29 +22,6 @@ const login = async (email, password) => {
     return userWithoutPassword;
 };
 
-const getProfile = async (id) => {
-    const user = await User.findByPk(id, {
-      attributes: { exclude: ['password'] },
-    });
-    if (!user) throw new AppError('User not found', 404);
-
-    const followersCount = await Follow.count({
-        where:{
-            following_id : id
-        }
-    });
-    const followingsCount = await Follow.count({
-        where:{
-            follower_id : id
-        }
-    });
-    return {
-        ...user.toJSON(),
-        followersCount,
-        followingsCount
-    };
-};
-
 const updateProfile = async (id, data) => {
     const user = await User.findByPk(id);
     if (!user) throw new AppError('User not found', 404);
@@ -53,5 +30,5 @@ const updateProfile = async (id, data) => {
     return userWithoutPassword;
 };
 
-const userService = { register, login, getProfile, updateProfile };                                                                                                                                                                          
+const userService = { register, login, updateProfile };                                                                                                                                                                          
 export default userService;
