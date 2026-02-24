@@ -1,7 +1,8 @@
 import { User } from '../models/index.js';
+import { AppError } from '../middlewares/errorHandler.js';
 import bcrypt from 'bcrypt';
 
-const register = async (data) => {                                                                                                                                                                          
+const register = async (data) => {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     const user = await User.create({
       ...data,
@@ -22,6 +23,29 @@ const login = async (email, password) => {
     return userWithoutPassword;
 };
 
+const getProfile = async (id) => {
+    const user = await User.findByPk(id, {
+      attributes: { exclude: ['password'] },
+    });
+    if (!user) throw new AppError('User not found', 404);
+    return user;
+};
+
+const listUsers = async (page = 1, limit = 10) => {
+    const { count, rows } = await User.findAndCountAll({
+        attributes: { exclude: ['password'] },
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset: (page - 1) * limit,
+    });
+    return {
+        users: rows,
+        total: count,
+        page,
+        totalPages: Math.ceil(count / limit),
+    };
+};
+
 const updateProfile = async (id, data) => {
     const user = await User.findByPk(id);
     if (!user) throw new AppError('User not found', 404);
@@ -30,5 +54,5 @@ const updateProfile = async (id, data) => {
     return userWithoutPassword;
 };
 
-const userService = { register, login, updateProfile };                                                                                                                                                                          
+const userService = { register, login, getProfile, listUsers, updateProfile };
 export default userService;

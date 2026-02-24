@@ -27,6 +27,15 @@ const login = async (req, res, next) => {
     }
 };
 
+const getProfile = async (req, res, next) => {
+    try {
+        const user = await userService.getProfile(req.params.id);
+        return res.status(200).json({ success: true, data: user });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const updateProfile = async (req, res, next) => {
     try {
         const user = await userService.updateProfile(req.params.id, req.body);
@@ -36,5 +45,16 @@ const updateProfile = async (req, res, next) => {
     }
 };
 
-const userController = { register, login, updateProfile };
+const listUsers = async (req, res, next) => {
+    try {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const result = await userService.listUsers(page, limit);
+        return res.status(200).json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const userController = { register, login, getProfile, listUsers, updateProfile };
 export default userController;

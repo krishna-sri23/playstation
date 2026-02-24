@@ -26,7 +26,7 @@ app.use(express.json());
 
 // Test route
 app.get("/", (req, res) => {
-  res.json({ message: "Server is running" });
+  res.json({ message: "Server is running fine" });
 });
 
 app.use("/api", routes);
