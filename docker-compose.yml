@@ -18,22 +18,38 @@ services:
       timeout: 5s
       retries: 5
 
-  nodejs:
-    build: ./node-practice-repo
-    container_name: playstation-node
+  redis:
+    image: redis:7-alpine
+    container_name: playstation-redis
     restart: unless-stopped
     ports:
-      - "3000:3000"
-    environment:
-      DB_HOST: playstation-db
-      DB_PORT: 3306
-      DB_USER: appuser
-      DB_PASSWORD: apppassword
-      DB_NAME: playstation_db
-      NODE_ENV: development
-    depends_on:
-      playstation-db:
-        condition: service_healthy
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # nodejs:
+  #   build: ./node-practice-repo
+  #   container_name: playstation-node
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     DB_HOST: playstation-db
+  #     DB_PORT: 3306
+  #     DB_USER: appuser
+  #     DB_PASSWORD: apppassword
+  #     DB_NAME: playstation_db
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     NODE_ENV: development
+  #   depends_on:
+  #     playstation-db:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
 
 volumes:
   mysql_data:

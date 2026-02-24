@@ -29,6 +29,10 @@ const User = sequelize.define('User',{
   bio:{
     type: DataTypes.STRING(255),
     defaultValue: ''
+  },
+  status:{
+    type: DataTypes.ENUM('online', 'offline'),
+    defaultValue: 'offline'
   }},
   {
     tableName : 'user',

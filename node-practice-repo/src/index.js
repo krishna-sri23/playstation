@@ -11,15 +11,21 @@
 */
 import "dotenv/config";
 import express from "express";
+import http from "http";
 import cors from "cors";
 import sequelize from "./config/db.js";
 import redisClient from "./config/redis.js";
 import { errorHandler } from './middlewares/errorHandler.js';
 import "./models/index.js";
 import routes from "./routes/index.js";
+import { setupSocket } from "./socket/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Create HTTP server and attach socket.io
+const server = http.createServer(app);
+setupSocket(server);
 
 // Parse JSON request bodies
 app.use(cors());
@@ -42,11 +48,11 @@ const start = async () => {
     console.log("Database connected successfully");
 
     await sequelize.sync({
-        // alter: true
+        alter: true
     });
     console.log("Models synced");
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
@@ -58,6 +64,7 @@ start();
 
 const shutdown = async (signal) => {
   console.log(`${signal} received. Shutting down gracefully...`);
+  server.close();
   await redisClient.quit();
   await sequelize.close();
   console.log("Database and Redis connections closed");
